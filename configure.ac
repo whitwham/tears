@@ -105,7 +105,8 @@ AC_RUN_IFELSE(
   [ AC_MSG_NOTICE([detected iRODS 3.3.x])
    [HAVE_IRODS3=yes]
    AC_CHECK_LIB([RodsAPIs], [getRodsEnvFileName], [],
-     [AC_MSG_ERROR([unable to find the iRODS library libRodsAPIs])])])
+     [AC_MSG_ERROR([unable to find the iRODS library libRodsAPIs])])],
+    [AC_MSG_ERROR([test iRODS program failed with IRODS_HOME=${IRODS_HOME}])])
 
 AC_CONFIG_SRCDIR([tears.c])
 AC_CONFIG_FILES([Makefile])
