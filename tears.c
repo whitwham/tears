@@ -1,7 +1,7 @@
 /*
 * Copyright (c) 2015 Genome Research Ltd.
 *
-* Author: Andrew Whitwham <aw7@sanger.ac.uk>
+* Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 *
 * This file is part of tears.
 *

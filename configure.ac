@@ -58,7 +58,7 @@ AC_ARG_WITH([irods],
     [Specify the location of a run-in-place iRODS installation (default: /usr/local/lib/irods)])],
   [AS_IF(
     [test "x$with_irods" = "xno"],
-      [AC_MSG_FAILURE([iRODS is required to build baton])],
+      [AC_MSG_FAILURE([iRODS is required to build tears])],
     [test "x$with_irods" = "xyes"],
       [AC_MSG_NOTICE([using default iRODS location])
        IRODS_HOME="/usr/local/lib/irods"
@@ -102,33 +102,10 @@ AC_RUN_IFELSE(
   exit(-1);
 #endif
 ])],
-  [ dnl AC_DEFINE([HAVE_IRODS3], [], [iRODS 3.3.x])
-   AC_MSG_NOTICE([detected iRODS 3.3.x])
+  [ AC_MSG_NOTICE([detected iRODS 3.3.x])
    [HAVE_IRODS3=yes]
    AC_CHECK_LIB([RodsAPIs], [getRodsEnvFileName], [],
      [AC_MSG_ERROR([unable to find the iRODS library libRodsAPIs])])])
-
-AM_CONDITIONAL(HAVE_IRODS3, test "x$HAVE_IRODS3" = "xyes")
-
-IRODS3_CPPFLAGS="${CPPFLAGS}"
-IRODS3_LDFLAGS="${LDFLAGS}"
-IRODS3_LIBS="${LIBS}"
-
-CPPFLAGS="${CPPFLAGS_ORIG}"
-LDFLAGS="${LDFLAGS_ORIG}"
-LIBS="${LIBS_ORIG}"
-dnl End iRODS 3.3.x
-
-dnl Examine the test results
-AS_IF(
-  [test "x$HAVE_IRODS3" = "xyes"],
-    [AC_MSG_NOTICE([detected an iRODS 3.3.x installation in ${IRODS_HOME}])
-     AC_DEFINE([HAVE_IRODS3], [1], [iRODS 3.3.x])
-     CPPFLAGS="${IRODS3_CPPFLAGS}"
-     LDFLAGS="${IRODS3_LDFLAGS}"
-     LDLIBS="${IRODS3_LIBS}"
-     LIBS="${IRODS3_LIBS}"],
-  [AC_MSG_ERROR([failed to detect iRODS 3.3.x installation])])
 
 AC_CONFIG_SRCDIR([tears.c])
 AC_CONFIG_FILES([Makefile])
