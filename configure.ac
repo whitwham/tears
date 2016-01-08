@@ -1,6 +1,6 @@
 dnl                                             -*- Autoconf -*-
 AC_COPYRIGHT([
-Copyright (c) 2015 Genome Research Ltd.
+Copyright (c) 2015, 2016 Genome Research Ltd.
 Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 
 This file is part of tears.
@@ -19,7 +19,7 @@ this program. If not, see <http://www.gnu.org/licenses>])
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([tears], [1.0], [aw7+github@sanger.ac.uk])
+AC_INIT([tears], [1.1], [aw7+github@sanger.ac.uk])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
@@ -109,6 +109,7 @@ AC_RUN_IFELSE(
     [AC_MSG_ERROR([test iRODS program failed with IRODS_HOME=${IRODS_HOME}])])
 
 AC_CONFIG_SRCDIR([tears.c])
+AC_CONFIG_HEADERS([tears_config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2015 Genome Research Ltd.
+* Copyright (c) 2015, 2016 Genome Research Ltd.
 *
 * Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 *
@@ -27,6 +27,7 @@
 *
 */
 
+#include "tears_config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,7 +43,8 @@ void usage_and_exit(char *pname, int exit_code) {
     fprintf(stderr, "\t-b bytes\tread/write buffer (default %d)\n", DEFAULT_BUFFER_SIZE);
     fprintf(stderr, "\t-v\t\tverbose mode\n");
     fprintf(stderr, "\t-d\t\tuse default server\n");
-    fprintf(stderr, "\t-h\t\tprint this help\n");
+    fprintf(stderr, "\t-h\t\tprint this help\n\n");
+    fprintf(stderr, "Version: %s  Author: %s\n", PACKAGE_STRING, PACKAGE_BUGREPORT );
     exit(exit_code);
 } 
 
@@ -200,6 +202,7 @@ int main (int argc, char **argv) {
     int status;
     char *obj_name = NULL;
     char *buffer;
+    char *prog_name;
     size_t buf_size = DEFAULT_BUFFER_SIZE;
     int verbose = 0;
     int opt;
@@ -250,6 +253,21 @@ int main (int argc, char **argv) {
     if ((buffer = malloc(buf_size)) == NULL) {
     	error_and_exit(conn, "Error: unable to set buffer to size %ld\n", buf_size);
     }
+    
+    // set the client name so iRODS knows what program is connecting to it
+    prog_name = strrchr(argv[0], '/');
+    
+    if (!prog_name) {
+    	prog_name = argv[0];
+    } else {
+    	prog_name++; // don't want the actual '/'
+    }
+    
+    if (verbose) {
+    	fprintf(stderr, "Setting client name to: %s\n", prog_name);
+    }
+    
+    setenv(SP_OPTION, prog_name, 1);
     
     // lets get the irods environment
     if ((status = getRodsEnv(&irods_env)) < 0) {
