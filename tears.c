@@ -202,7 +202,7 @@ int main (int argc, char **argv) {
     int status;
     char *obj_name = NULL;
     char *buffer;
-    char *prog_name;
+    char prog_name[10];
     size_t buf_size = DEFAULT_BUFFER_SIZE;
     int verbose = 0;
     int opt;
@@ -255,14 +255,8 @@ int main (int argc, char **argv) {
     }
     
     // set the client name so iRODS knows what program is connecting to it
-    prog_name = strrchr(argv[0], '/');
-    
-    if (!prog_name) {
-    	prog_name = argv[0];
-    } else {
-    	prog_name++; // don't want the actual '/'
-    }
-    
+    sprintf(prog_name, "%s:%s", PACKAGE_NAME, PACKAGE_VERSION);
+   
     if (verbose) {
     	fprintf(stderr, "Setting client name to: %s\n", prog_name);
     }
