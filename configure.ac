@@ -1,6 +1,6 @@
 dnl                                             -*- Autoconf -*-
 AC_COPYRIGHT([
-Copyright (c) 2015, 2016 Genome Research Ltd.
+Copyright (c) 2015-2016 Genome Research Ltd.
 Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 
 This file is part of tears.
@@ -21,12 +21,31 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.68])
 AC_INIT([tears], [1.1], [aw7+github@sanger.ac.uk])
 
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 AC_PROG_CC
 AC_PROG_CC_C99
 AC_PROG_CC_C_O
 AC_LANG([C])
+
+AC_ARG_ENABLE(debug,
+    AS_HELP_STRING([--enable-debug],[use compiler debug flags (default no)]),
+    [debug=${enableval}],[debug=no])
+AC_ARG_ENABLE(profile,
+    AS_HELP_STRING([--enable-profile],[use compiler profiling flags (default no)]),
+    [profile=${enableval}],[profile=no])
+AC_ARG_ENABLE(optimise,
+    AS_HELP_STRING([--enable-optimise],[use highest optimisation flag (default no)]),
+    [optimise=${enableval}],[optimise=no])
+
+if test "${debug}" = "yes" ; then
+    CFLAGS="-g -O0"
+    CPPFLAGS="-Wall"
+elif test "${profile}" = "yes" ; then
+    CFLAGS="-g -pg"
+elif test "${optimise}" = "yes" ; then
+    CFLAGS="-O3"
+fi
 
 # Checks for header files
 AC_CHECK_HEADERS([stdio.h stdlib.h string.h unistd.h stdarg.h], [], [
