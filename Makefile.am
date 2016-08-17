@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses>
 
+ACLOCAL_AMFLAGS= -I m4
+
+AM_CPPFLAGS = $(IRODS_CPPFLAGS)
+AM_LDFLAGS  = $(IRODS_LDFLAGS)
+LIBS       += $(IRODS_LIBS)
 bin_PROGRAMS = tears
 
 tears_SOURCES = tears.c

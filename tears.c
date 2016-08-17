@@ -171,20 +171,36 @@ int irods_uri_check(char *uri, rodsEnv *env, int verb) {
 
 
 void choose_server(rcComm_t **cn, char *host, rodsEnv *env, int verb) {
-    int stat;
 
     if (verb) {
 	fprintf(stderr, "Chosen server is: %s\n", host);
     }
 
     if (host && strcmp(host, THIS_ADDRESS)) {
-	if ((stat = rcReconnect(cn, host, env, 0)) != 0) {
-    	    fprintf(stderr, "Error: rcReconnect failed with status %d.  Continuing with original server.\n", stat);
+    	int       stat;
+    	rErrMsg_t err_msg;
+	rcComm_t  *new_cn = NULL;
+	
+	new_cn = rcConnect(host, env->rodsPort, env->rodsUserName,
+	    	    	   env->rodsZone, 0, &err_msg);
+			   
+	if (!new_cn) {
+    	    fprintf(stderr, "Error: rcReconnect failed with status %d.  Continuing with original server.\n", err_msg.status);
 	    return;
 	}
-
-	if ((stat = clientLogin(*cn)) < 0) {
+	    
+	#if IRODS_VERSION_INTEGER && IRODS_VERSION_INTEGER >= 4001008
+	    stat = clientLogin(new_cn, "", "");
+	#else
+	    stat = clientLogin(new_cn);
+	#endif
+	
+	if (stat < 0) {
+	    rcDisconnect(new_cn);
     	    error_and_exit(*cn, "Error: clientLogin failed with status %d\n", stat);
+	} else {
+	    rcDisconnect(*cn);
+	    *cn = new_cn;
 	}
     }
 }
@@ -280,6 +296,10 @@ int main (int argc, char **argv) {
 	    irods_env.rodsUserName, irods_env.rodsPort);
     }
     
+    #if IRODS_VERSION_INTEGER && IRODS_VERSION_INTEGER >= 4001008
+	init_client_api_table();
+   #endif
+    
     // make the irods connections
     conn = rcConnect(irods_env.rodsHost, irods_env.rodsPort,
     	    	     irods_env.rodsUserName, irods_env.rodsZone,
@@ -290,7 +310,13 @@ int main (int argc, char **argv) {
 	exit(EXIT_FAILURE);
     }
     
-    if ((status = clientLogin(conn)) < 0) {
+    #if IRODS_VERSION_INTEGER && IRODS_VERSION_INTEGER >= 4001008
+	status = clientLogin(conn, "", "");
+    #else
+	status = clientLogin(conn);
+    #endif
+
+    if (status < 0) {
     	error_and_exit(conn, "Error: clientLogin failed with status %d\n", status);
     }
   
