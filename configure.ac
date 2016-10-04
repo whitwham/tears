@@ -20,7 +20,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
 
-AC_INIT([tears], [1.2], [aw7+github@sanger.ac.uk])
+AC_INIT([tears], [1.2.1], [aw7+github@sanger.ac.uk])
 AC_USE_SYSTEM_EXTENSIONS
 
 AM_INIT_AUTOMAKE([-Wall foreign])
