@@ -38,13 +38,16 @@
 #define DEFAULT_BUFFER_SIZE 1048576
 
 void usage_and_exit(char *pname, int exit_code) {
-    fprintf(stderr, "Usage: %s [-b bytes -v -d -h] /path/to/irods/output/file < filein \n", pname);
-    fprintf(stderr, "    or %s [-b bytes -v -d -h] -r /path/to/irods/input/file > fileout\n\n", pname);
-    fprintf(stderr, "\t-b bytes\tread/write buffer (default %d)\n", DEFAULT_BUFFER_SIZE);
-    fprintf(stderr, "\t-v\t\tverbose mode\n");
-    fprintf(stderr, "\t-d\t\tuse default server\n");
-    fprintf(stderr, "\t-h\t\tprint this help\n\n");
-    fprintf(stderr, "Version: %s  Author: %s\n", PACKAGE_STRING, PACKAGE_BUGREPORT );
+    fprintf(stdout, "Usage: %s [-b bytes -v -d -h] [-w] /path/to/irods/output/file < filein \n", pname);
+    fprintf(stdout, "    or %s [-b bytes -v -d -h] -r /path/to/irods/input/file > fileout\n\n", pname);
+    fprintf(stdout, "%s, a program to stream data in to or out of iRODS.\n\n", PACKAGE);
+    fprintf(stdout, "\t-w\t\twrite to iRODS\n");
+    fprintf(stdout, "\t-r\t\tread from iRODS\n");
+    fprintf(stdout, "\t-b bytes\tread/write buffer (default %d)\n", DEFAULT_BUFFER_SIZE);
+    fprintf(stdout, "\t-v\t\tverbose mode\n");
+    fprintf(stdout, "\t-d\t\tuse default server\n");
+    fprintf(stdout, "\t-h\t\tprint this help\n\n");
+    fprintf(stdout, "Version: %s  Author: %s\n", PACKAGE_STRING, PACKAGE_BUGREPORT);
     exit(exit_code);
 } 
 
@@ -239,7 +242,7 @@ int main (int argc, char **argv) {
     int write_to_irods = 1;
     int server_set = 0;
     
-    while ((opt = getopt(argc, argv, "b:vhrd")) != -1) {
+    while ((opt = getopt(argc, argv, "b:vhrdw")) != -1) {
     	switch (opt) {
 	    case 'b':
 	    	buf_size = atoi(optarg);
@@ -256,6 +259,10 @@ int main (int argc, char **argv) {
 		
 	    case 'r':
 	    	write_to_irods = 0;
+		break;
+		
+	    case 'w':
+	    	// dummy write option to be enforced later
 		break;
 		
 	    case 'd':
