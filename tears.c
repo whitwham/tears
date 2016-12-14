@@ -103,12 +103,17 @@ int irods_uri_check(char *uri, rodsEnv *env, int verb) {
         return 0;;
     }
 
-    char *auth      = strstr(uri, "//");
-    char *tag_start = auth + strlen("//");
-    char *port_end  = strchr(tag_start, '/');
+    char *auth  = strstr(uri, "//");
+    char *tag_start;
+    char *port_end;
+    
+    if (auth) {
+    	tag_start = auth + strlen("//");
+    	port_end  = strchr(tag_start, '/');
+    }
     
     if (!auth || !port_end) {
-        fprintf(stderr, "Error: invalid uri %s\n", uri);
+    	fprintf(stderr, "URI format needed: irods://[irodsUserName%%23irodsZone@][irodsHost][:irodsPort]/collection_path/data_object\n");
 	return -1;
     }
 
@@ -140,7 +145,7 @@ int irods_uri_check(char *uri, rodsEnv *env, int verb) {
     }
 
     if (!host) {
-        fprintf(stderr, "Error: invalid uri: %s\n", uri);
+        fprintf(stderr, "Error: invalid uri (no host): %s\n", uri);
 	return -1;
     }
     
@@ -234,7 +239,7 @@ int main (int argc, char **argv) {
     int status;
     char *obj_name = NULL;
     char *buffer;
-    char prog_name[10];
+    char prog_name[255];
     size_t buf_size = DEFAULT_BUFFER_SIZE;
     int verbose = 0;
     int opt;
@@ -305,7 +310,7 @@ int main (int argc, char **argv) {
     }
     
     if ((status = irods_uri_check(obj_name, &irods_env, verbose)) < 0) {
-    	error_and_exit(conn, "Error: invalid uri %s\n", obj_name);
+    	error_and_exit(conn, "Error: invalid uri: %s\n", obj_name);
     } else if (status > 0) {
     	server_set = 1;
     }
