@@ -1,6 +1,6 @@
 dnl                                             -*- Autoconf -*-
 AC_COPYRIGHT([
-Copyright (c) 2015-2016 Genome Research Ltd.
+Copyright (c) 2015-2016, 2018 Genome Research Ltd.
 Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 
 This file is part of tears.
@@ -20,7 +20,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
 
-AC_INIT([tears], [1.2.3], [aw7+github@sanger.ac.uk])
+AC_INIT([tears], [1.2.4], [aw7+github@sanger.ac.uk], [tears], [https://github.com/whitwham/tears])
 AC_USE_SYSTEM_EXTENSIONS
 
 AM_INIT_AUTOMAKE([-Wall foreign])
