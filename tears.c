@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2015-2016, 2018 Genome Research Ltd.
+* Copyright (c) 2015-2016, 2018-2019 Genome Research Ltd.
 *
 * Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 *
@@ -47,7 +47,9 @@ void usage_and_exit(char *pname, int exit_code) {
     fprintf(stdout, "\t-v\t\tverbose mode\n");
     fprintf(stdout, "\t-d\t\tuse default server\n");
     fprintf(stdout, "\t-f\t\tforce overwrite of existing file on iRODS\n");
+    fprintf(stdout, "\t-t\t\treconnect to server at intervals\n");
     fprintf(stdout, "\t-h\t\tprint this help\n\n");
+    fprintf(stdout, "IRODS version %s\n", RODS_REL_VERSION);
     fprintf(stdout, "Version: %s  Author: %s\n", PACKAGE_STRING, PACKAGE_BUGREPORT);
     fprintf(stdout, "Github: %s\n", PACKAGE_URL);
     exit(exit_code);
@@ -193,7 +195,7 @@ int irods_uri_check(char *uri, rodsEnv *env, int verb) {
 }
 
 
-void choose_server(rcComm_t **cn, char *host, rodsEnv *env, int verb) {
+void choose_server(rcComm_t **cn, char *host, rodsEnv *env, int recon, int verb) {
 
     if (verb) {
 	fprintf(stderr, "Chosen server is: %s\n", host);
@@ -205,7 +207,7 @@ void choose_server(rcComm_t **cn, char *host, rodsEnv *env, int verb) {
 	rcComm_t  *new_cn = NULL;
 
 	new_cn = rcConnect(host, env->rodsPort, env->rodsUserName,
-	    	    	   env->rodsZone, 0, &err_msg);
+	    	    	   env->rodsZone, recon, &err_msg);
 
 	if (!new_cn) {
     	    fprintf(stderr, "Error: rcReconnect failed with status %d.  Continuing with original server.\n", err_msg.status);
@@ -249,8 +251,9 @@ int main (int argc, char **argv) {
     int write_to_irods = 0;
     int server_set = 0;
     int force_write = 0;
+    int reconnect = 0;
 
-    while ((opt = getopt(argc, argv, "b:vhrdwf")) != -1) {
+    while ((opt = getopt(argc, argv, "b:vhrdwft")) != -1) {
     	switch (opt) {
 	    case 'b':
 	    	buf_size = atoi(optarg);
@@ -279,6 +282,10 @@ int main (int argc, char **argv) {
 
             case 'f':
                 force_write = 1;
+                break;
+                
+            case 't':
+                reconnect = RECONN_TIMEOUT;
                 break;
 
 	    case 'h':
@@ -335,7 +342,7 @@ int main (int argc, char **argv) {
     // make the irods connections
     conn = rcConnect(irods_env.rodsHost, irods_env.rodsPort,
     	    	     irods_env.rodsUserName, irods_env.rodsZone,
-		     0, &err_msg);
+		     reconnect, &err_msg);
 
     if (!conn) {
     	print_irods_error("Error: rcConnect failed:", &err_msg);
@@ -371,7 +378,7 @@ int main (int argc, char **argv) {
 		error_and_exit(conn, "Error: rcGetHostForPut failed with status %d:%s\n", status, get_irods_error_name(status, verbose));
 	    }
 
-    	    choose_server(&conn, new_host, &irods_env, verbose);
+    	    choose_server(&conn, new_host, &irods_env, reconnect, verbose);
 	    free(new_host);
 	}
 
@@ -388,7 +395,7 @@ int main (int argc, char **argv) {
                 error_and_exit(conn, "Error: rcGetHostForGet failed with status %d:%s\n", status, get_irods_error_name(status, verbose));
 	    }
 
-    	    choose_server(&conn, new_host, &irods_env, verbose);
+    	    choose_server(&conn, new_host, &irods_env, reconnect, verbose);
 	    free(new_host);
 	}
 
