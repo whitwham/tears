@@ -323,6 +323,24 @@ int open_data_object(
     return open_fd;
 }
 
+int is_status_connection_failure(const int status) {
+    return (SYS_HEADER_READ_LEN_ERR == status ||
+            (status <= SYS_SOCK_READ_ERR &&
+             status >= SYS_SOCK_READ_ERR - 999));
+}
+
+int reset_stream_for_retry(
+    rcComm_t** conn,
+    tears_context_t* ctx,
+    FILE* stream,
+    const unsigned long offset) {
+    int status = connect_to_server(conn, ctx);
+    if (status < 0) {
+        fprintf(stderr, "Reconnection failed with status %d.\n", status);
+    }
+    fseek(stream, offset, SEEK_SET);
+    return open_data_object(*conn, ctx, offset);
+}
 
 int main (int argc, char **argv) {
     rcComm_t           *conn = NULL;
@@ -462,7 +480,11 @@ int main (int argc, char **argv) {
             data_buffer.len = open_obj.len;
 
             if ((read_in = rcDataObjRead(conn, &open_obj, &data_buffer)) < 0) {
-                error_and_exit(conn, "Error:  rcDataObjRead failed with status %ld:%s\n", read_in, get_irods_error_name(read_in, verbose));
+                if (is_status_connection_failure(read_in)) {
+                    open_fd = reset_stream_for_retry(&conn, &ctx, stdout, total_written);
+                    continue;
+                }
+                error_and_exit(conn, "Error:  rcDataObjRead failed with status %ld:%s\n", read_in, get_irods_error_name(read_in, ctx.verbose));
             }
         }
 
@@ -478,7 +500,11 @@ int main (int argc, char **argv) {
             data_buffer.len = open_obj.len;
 
             if ((written_out = rcDataObjWrite(conn, &open_obj, &data_buffer)) < 0) {
-                error_and_exit(conn, "Error:  rcDataObjWrite failed with status %ld\n", written_out, get_irods_error_name(written_out, verbose));
+                if (is_status_connection_failure(written_out)) {
+                    open_fd = reset_stream_for_retry(&conn, &ctx, stdin, total_written);
+                    continue;
+                }
+                error_and_exit(conn, "Error:  rcDataObjWrite failed with status %ld\n", written_out, get_irods_error_name(written_out, ctx.verbose));
             }
         } else {
             written_out = fwrite(buffer, 1, read_in, stdout);
