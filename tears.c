@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2015-2016, 2018-2019 Genome Research Ltd.
+* Copyright (c) 2015-2016, 2018-2020 Genome Research Ltd.
 *
 * Author: Andrew Whitwham <aw7+github@sanger.ac.uk>
 *
@@ -68,10 +68,9 @@ void usage_and_exit(char *pname, int exit_code) {
 }
 
 
-char *get_irods_error_name(int status, int verb) {
+const char *get_irods_error_name(int status, int verb) {
     char *subname = 0;
-    char *name;
-    name = rodsErrorName(status, &subname);
+    const char *name = rodsErrorName(status, &subname);
 
     if (verb) {
         fprintf(stderr, "Extra error message: %s\n", subname);
@@ -83,7 +82,8 @@ char *get_irods_error_name(int status, int verb) {
 
 void print_irods_error(char *msg, rErrMsg_t *err) {
     char *subname = 0;
-    char *name    = rodsErrorName(err->status, &subname);
+    const char *name = rodsErrorName(err->status, &subname);
+
 
     fprintf(stderr, "%s name %s (%s) (%d) %s\n", msg, name, subname,
                 err->status, err->msg);
@@ -660,7 +660,7 @@ int main (int argc, char **argv) {
     ret = rcDisconnect(conn);
 
     if (ctx.verbose) {
-        fprintf(stderr, "main: Disonnect return %d\n", ret);
+        fprintf(stderr, "main: Disconnect return %d\n", ret);
     }
 
     free(buffer);
