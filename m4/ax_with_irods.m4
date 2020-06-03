@@ -44,6 +44,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# From github.com/wtsi-npg/baton by Keith James
+#
+# Authors: Keith James and Andrew Whitwham
+#
 
 AC_DEFUN([AX_WITH_IRODS], [
    IRODS_HOME=
